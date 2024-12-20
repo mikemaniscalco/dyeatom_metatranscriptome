@@ -1,0 +1,65 @@
+# first, find matches to filenames of this form:
+with open('sra_list.txt') as fh:
+    sampleNames = [line.strip() for line in fh]
+
+rule all:
+    input:
+        expand("logs/salmon/{sra_id}.log", sra_id=sampleNames),
+        expand("salmon/{sra_id}/quant.sf", sra_id=sampleNames),
+        expand("salmon/{sra_id}/lib_format_counts.json", sra_id=sampleNames),
+
+
+rule salmon_index:
+    input:
+        sequences="megahit/dyeatom_assembly/dyeatom_orfs.ffn",
+    output:
+        multiext(
+            "salmon/transcriptome_index/",
+            "complete_ref_lens.bin",
+            "ctable.bin",
+            "ctg_offsets.bin",
+            "duplicate_clusters.tsv",
+            "info.json",
+            "mphf.bin",
+            "pos.bin",
+            "pre_indexing.log",
+            "rank.bin",
+            "refAccumLengths.bin",
+            "ref_indexing.log",
+            "reflengths.bin",
+            "refseq.bin",
+            "seq.bin",
+            "versionInfo.json",
+        ),
+    log:
+        "logs/salmon/transcriptome_index.log",
+    threads: 2
+    # params:
+    #     # optional parameters
+    #     extra="",
+    wrapper:
+        "v3.13.5/bio/salmon/index"
+
+rule salmon_quant_reads:
+    input:
+        # If you have multiple fastq files for a single sample (e.g. technical replicates)
+        # use a list for r1 and r2.
+        r1="fastq_files/{sra_id}_R1.fq.gz",
+        r2="fastq_files/{sra_id}_R2.fq.gz",
+        index="salmon/transcriptome_index",
+    output:
+        quant="salmon/{sra_id}/quant.sf",
+        lib="salmon/{sra_id}/lib_format_counts.json",
+    log:
+        "logs/salmon/{sra_id}.log",
+    params:
+        # optional parameters
+        libtype="A",
+        extra="seqBias",
+    threads: 2
+    # the wrappers are prepared and downloaded via github. Must use the "--use-conda" flag when running snakefile
+    wrapper:
+        "v5.1.0/bio/salmon/quant"
+
+
+# rule to rename file and remove extra stuff

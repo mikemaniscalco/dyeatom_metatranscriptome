@@ -1,0 +1,60 @@
+import os
+
+def files_to_string(directory):
+    # List all files in the directory
+    files = os.listdir(directory)
+    
+    # Filter out only the files that end with "_filtered.fq.gz" and include the full file paths
+    filtered_files = [os.path.join(directory, file) for file in files if file.endswith("_filtered.fq.gz")]
+    
+    # Join the file paths into a comma-separated string
+    csv_string = ','.join(filtered_files)
+    
+    return csv_string
+
+# Example usage
+directory = 'fastq_files'
+input_string = files_to_string(directory)
+print("input_string: ")
+print(input_string)
+directory_name = 'dyeatom_assembly'
+
+# # Generate input file paths
+rule all:
+    input:
+        "megahit/dyeatom_assembly/dyeatom_orfs.ffn",
+        "megahit/dyeatom_assembly/dyeatom_orfs.faa",
+        "megahit/dyeatom_assembly/dyeatom_orfs.out",
+        "megahit/dyeatom_assembly/dyeatom_orfs.gff"
+        
+# note that the minimum contig length is set to 200bp by defailt
+rule megahit:
+    params:
+        input = input_string,
+        dir="megahit/dyeatom_assembly",
+    # while the output name is not used in running the shell command it is needed for the workflow to identify the rule completion and the availability of the file for the next rule
+    output:
+        fasta = "megahit/dyeatom_assembly/final.contigs.fa",    
+    shell:
+        "megahit --12 {params.input} -f -o {params.dir} -m 0.5 -t 4" 
+        
+rule simplify_seq_names:
+    input:
+        "megahit/dyeatom_assembly/final.contigs.fa",
+    output:
+        "megahit/dyeatom_assembly/final.contigs_renamed.fa",
+    shell:
+        "reformat.sh in={input} out={output} trd=t"
+        
+rule find_orfs:
+    input:
+        "megahit/dyeatom_assembly/final.contigs_renamed.fa",
+    output:
+        aas = "megahit/dyeatom_assembly/dyeatom_orfs.faa",
+        nts = "megahit/dyeatom_assembly/dyeatom_orfs.ffn",
+        meta = "megahit/dyeatom_assembly/dyeatom_orfs.out",
+        gff = "megahit/dyeatom_assembly/dyeatom_orfs.gff",
+
+    shell:
+        "FragGeneScanRs -s {input} -m {output.meta} -a {output.aas} -n {output.nts} -g {output.gff} -w 1 -t complete"
+        

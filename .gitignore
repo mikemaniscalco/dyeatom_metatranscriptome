@@ -1,0 +1,11 @@
+*.gz
+*.fa
+fastq_files/*
+logs/*
+salmon/*
+megahit/*
+*.fasta
+sortmerna/*
+archived_files/*
+*.DS_Store
+

@@ -1,0 +1,32 @@
+import os
+
+rule salmon_index:
+    input:
+        sequences="megahit/dyeatom_assembly/dyeatom_orfs.ffn",
+    output:
+        multiext(
+            "salmon/transcriptome_index/",
+            "complete_ref_lens.bin",
+            "ctable.bin",
+            "ctg_offsets.bin",
+            "duplicate_clusters.tsv",
+            "info.json",
+            "mphf.bin",
+            "pos.bin",
+            "pre_indexing.log",
+            "rank.bin",
+            "refAccumLengths.bin",
+            "ref_indexing.log",
+            "reflengths.bin",
+            "refseq.bin",
+            "seq.bin",
+            "versionInfo.json",
+        ),
+    log:
+        "logs/salmon/transcriptome_index.log",
+    threads: 2
+    # params:
+    #     # optional parameters
+    #     extra="",
+    wrapper:
+        "v5.1.0/bio/salmon/index"
