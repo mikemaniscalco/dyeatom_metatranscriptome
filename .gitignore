@@ -1,11 +1,8 @@
 *.gz
 *.fa
-fastq_files/*
+results/*
 logs/*
-salmon/*
-megahit/*
 *.fasta
-sortmerna/*
 archived_files/*
 *.DS_Store
-
+.snakemake/*

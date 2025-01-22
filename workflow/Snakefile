@@ -1,0 +1,22 @@
+# first, find matches to filenames of this form:
+# Load sampleNames from the config.yaml file
+configfile: "workflow/config/config.yaml"
+sampleNames = config["sampleNames"]
+projectName = config["projectName"]
+
+include: "rules/Snakefile1GetPrepReads.smk"
+include: "rules/Snakefile2Assemble.smk"
+include: "rules/Snakefile3MapReads.smk"
+
+rule all:
+    input:
+        expand("results/intermediate_fastqs/{sra_id}_filtered.fq.gz", sra_id=sampleNames),
+        expand("results/intermediate_fastqs/{sra_id}_aligned.fq.gz", sra_id=sampleNames),
+        expand("logs/salmon/{sra_id}.log", sra_id=sampleNames),
+        expand("results/salmon/{sra_id}/quant.sf", sra_id=sampleNames),
+        expand("results/salmon/{sra_id}/lib_format_counts.json", sra_id=sampleNames),
+        "results/megahit/assembly/final.contigs.fa",
+        "results/megahit/assembly/" + projectName + "_final.contigs.fa",
+        "results/megahit/assembly/" + projectName + "_final_orfs.ffn",
+        "logs/salmon/transcriptome_index.log",
+        "results/salmon/transcriptome_index",
