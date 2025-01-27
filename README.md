@@ -36,8 +36,7 @@ Note that additional workflows will be added over the next few weeks as I collec
 ```
 {bash}
 # the environment name "env_snakemake" is used below but modify as desired
-conda create -c conda-forge -c bioconda -n env_snakemake python=3.10 snakemake wget pigz install fastp sortmerna bbmap graphviz seqtk megahit==1.2.8
-  salmon==1.10.3
+conda create -c conda-forge -c bioconda -n env_snakemake python=3.10 snakemake graphviz
 
 conda activate env_snakemake  
 
@@ -68,15 +67,14 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 cargo install frag_gene_scan_rs  
   
 conda install bioconda::java-jdk
-conda install bioconda::salmon
 ```
 
 ### Run 
 
 ```
 {bash}
-snakemake -s workflow/Snakefile
+snakemake -s workflow/Snakefile --cores 2 --use-conda
 
 # generate DAG diagram
-snakemake -s workflow/SnakefileFull --cores 2 --rulegraph | dot -Tpng > dag.png
+snakemake -s workflow/Snakefile --cores 2 --use-conda --rulegraph | dot -Tpng > dag.png
 ```
