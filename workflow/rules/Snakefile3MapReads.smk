@@ -29,8 +29,6 @@ rule salmon_quant_reads:
         extra   = "--seqBias --gcBias"
     threads: config["salmonThreads"]
     # the wrappers are prepared and downloaded via github
-    log:
-        "logs/salmon/transcriptome_index.log",
     conda:
         "../envs/salmon_quant.yaml"
     shell:

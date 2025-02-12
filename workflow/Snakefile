@@ -4,14 +4,17 @@ configfile: "workflow/config/config.yaml"
 sampleNames = config["sampleNames"]
 projectName = config["projectName"]
 megahit_path = Path("results/megahit/assembly")
+data_path = Path("results/data")
+
 megahit_assembly_fa = megahit_path / f"{projectName}_final.contigs.fa"
 megahit_orfs_ffn_fname = megahit_path / f"{projectName}_final_orfs.ffn"
-
+merged_counts_fname = data_path / f"{projectName}_counts.csv"
 
 include: "rules/Snakefile1GetPrepReadsRibodetector.smk"
 include: "rules/Snakefile2Assemble.smk"
 include: "rules/Snakefile3.0SalmonIndex.smk"
 include: "rules/Snakefile3MapReads.smk"
+include: "rules/Snakefile4MergeCounts.smk"
 
 rule all:
     input:
@@ -23,3 +26,4 @@ rule all:
         megahit_orfs_ffn_fname,
         "results/salmon/transcriptome_index/seq.bin",
         "logs/salmon/transcriptome_index.log",
+        merged_counts_fname
